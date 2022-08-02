@@ -20,11 +20,8 @@ public class QueryExecutor implements AutoCloseable {
     }
 
     public ReportData execute(String query) {
-        var command = Arrays.stream(QueryCommand.values())
-                .filter(queryCommand -> StringUtils.containsIgnoreCase(query, queryCommand.name())).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Can't recognize query command for query: " + query));
         try {
-            if (SELECT.equals(command)) {
+            if (SELECT.equals(getCommandFromQuery(query))) {
                 try (var resultSet = connection.createStatement().executeQuery(query)) {
                     return createReportData(resultSet);
                 }
@@ -35,15 +32,20 @@ public class QueryExecutor implements AutoCloseable {
         }
     }
 
-    ReportData createReportData(ResultSet resultSet) throws SQLException {
-        var resultSetMetaData = resultSet.getMetaData();
-
-        return new ReportData(getColumnLabels(resultSetMetaData),
-                getTableValues(resultSet, resultSetMetaData.getColumnCount()), false);
+    QueryCommand getCommandFromQuery(String query) {
+        return Arrays.stream(QueryCommand.values())
+                .filter(queryCommand -> StringUtils.containsIgnoreCase(query, queryCommand.name())).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Can't recognize query command for query: " + query));
     }
 
-    String[] getColumnLabels(ResultSetMetaData resultSetMetaData) throws SQLException {
+    ReportData createReportData(ResultSet resultSet) throws SQLException {
+        var resultSetMetaData = resultSet.getMetaData();
         var columnCount = resultSetMetaData.getColumnCount();
+        return new ReportData(getColumnLabels(resultSetMetaData, columnCount),
+                getTableValues(resultSet, columnCount), false);
+    }
+
+    String[] getColumnLabels(ResultSetMetaData resultSetMetaData, int columnCount) throws SQLException {
         var labels = new String[columnCount];
 
         for (int i = 0; i < columnCount; i++) {
