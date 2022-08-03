@@ -1,5 +1,5 @@
 # db-client
-## Properties in environment variables:
+## Properties at environment variables:
 
 * url
 * user
