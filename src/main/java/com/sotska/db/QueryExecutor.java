@@ -11,7 +11,7 @@ import java.util.List;
 
 import static com.sotska.entity.QueryCommand.*;
 
-public class QueryExecutor implements AutoCloseable {
+public class QueryExecutor {
 
     private final Connection connection;
 
@@ -70,10 +70,5 @@ public class QueryExecutor implements AutoCloseable {
             System.arraycopy(data.get(i), 0, result[i], 0, columnCount);
         }
         return result;
-    }
-
-    @Override
-    public void close() throws Exception {
-        connection.close();
     }
 }
