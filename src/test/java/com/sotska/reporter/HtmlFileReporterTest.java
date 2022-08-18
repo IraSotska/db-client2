@@ -51,7 +51,7 @@ class HtmlFileReporterTest {
     void shouldCreateReportByPath() throws IOException {
         var reportData = new ReportData(COLUMN_NAMES, TABLE_DATA, false);
 
-        HtmlFileReporter.createReport(reportData, path);
+        HtmlFileReporter.createReport(reportData, path, 3000);
 
         var reportFromFile = Files.readString((new File(path).listFiles())[0].toPath());
 

@@ -8,12 +8,12 @@ import java.time.format.DateTimeFormatter;
 
 public class HtmlFileReporter {
 
-    public static void createReport(ReportData reportData, String reportPath) {
+    public static void createReport(ReportData reportData, String reportPath, int port) {
         if (reportData.isUpdate()) {
             return;
         }
         var report = buildReport(reportData);
-        saveReportToFile(report, reportPath);
+        reportData.setReportPath("http://localhost:" + port + "/" + saveReportToFile(report, reportPath));
     }
 
     static String buildReport(ReportData reportData) {
@@ -37,19 +37,21 @@ public class HtmlFileReporter {
         return stringBuilder.toString();
     }
 
-    static void saveReportToFile(String report, String path) {
-        var reportFile = new File(path, "report" + getFileReporterPrefix() + ".html");
+    static String saveReportToFile(String report, String path) {
+        var reportFileName = "report" + getFileReporterPrefix() + ".html";
+        var reportFile = new File(path, reportFileName);
         reportFile.getParentFile().mkdir();
 
         try (var bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reportFile)))) {
             bufferedWriter.write(report);
+            return reportFileName;
         } catch (IOException e) {
             throw new RuntimeException("Can't save report to file by path: " + path, e);
         }
     }
 
     private static String getFileReporterPrefix() {
-        var dateTimeFormatter = DateTimeFormatter.ofPattern("_yyyy-MM-dd-HH__mm-ss");
+        var dateTimeFormatter = DateTimeFormatter.ofPattern("_yyyy-MM-dd_HH-mm-ss");
         return dateTimeFormatter.format(LocalDateTime.now());
     }
 }

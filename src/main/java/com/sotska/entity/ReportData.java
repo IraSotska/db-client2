@@ -5,7 +5,8 @@ public class ReportData {
     private String[] columnNames;
     private Object[][] data;
     private int updatedRows;
-    private boolean isUpdate;
+    private final boolean isUpdate;
+    private String reportPath;
 
     public ReportData(String[] columnNames, Object[][] data, boolean isUpdate) {
         this.columnNames = columnNames;
@@ -32,5 +33,13 @@ public class ReportData {
 
     public boolean isUpdate() {
         return isUpdate;
+    }
+
+    public String getReportPath() {
+        return reportPath;
+    }
+
+    public void setReportPath(String reportPath) {
+        this.reportPath = reportPath;
     }
 }

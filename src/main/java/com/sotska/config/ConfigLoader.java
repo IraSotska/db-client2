@@ -1,41 +1,27 @@
 package com.sotska.config;
 
-import com.sotska.entity.Configuration;
-
 import java.io.IOException;
 import java.util.Properties;
 
+import static java.util.Objects.isNull;
+
 public class ConfigLoader {
 
-    private static final String REPORTS_PATH = "reportsPath";
-    private static final String URL = "url";
-    private static final String USER = "user";
-    private static final String PASSWORD = "password";
+    private final Properties properties;
+    private final Properties systemProperties;
 
-    public static Configuration loadConfig(String path) {
+    public ConfigLoader(String path) {
+        properties = new Properties();
+        systemProperties = System.getProperties();
 
-        var property = new Properties();
         try (var inputStream = ConfigLoader.class.getClassLoader().getResourceAsStream(path)) {
-            property.load(inputStream);
-
-            var systemProperties = System.getProperties();
-
-            return new Configuration(
-                    !systemProperties.containsKey(REPORTS_PATH) ?
-                            property.getProperty(REPORTS_PATH) :
-                            systemProperties.getProperty(REPORTS_PATH),
-                    !systemProperties.containsKey(URL) ?
-                            property.getProperty(URL) :
-                            systemProperties.getProperty(URL),
-                    !systemProperties.containsKey(USER) ?
-                            property.getProperty(USER) :
-                            systemProperties.getProperty(USER),
-                    !systemProperties.containsKey(PASSWORD) ?
-                            property.getProperty(PASSWORD) :
-                            systemProperties.getProperty(PASSWORD));
-
+            properties.load(inputStream);
         } catch (IOException e) {
             throw new RuntimeException("Can't load configuration properties", e);
         }
+    }
+
+    public String getProperty(String key) {
+        return isNull(systemProperties.getProperty(key)) ? properties.getProperty(key) : systemProperties.getProperty(key);
     }
 }

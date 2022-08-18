@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OutputReporterTest {
 
@@ -16,17 +17,18 @@ class OutputReporterTest {
         var columnNames = new String[]{"column1", "column2", "column3"};
         var tableData = new String[][]{{"data1", "data2", "data3"}, {"data4", "data5", "data6"}};
 
-        var expectedResult = " ___________________________\r\n" +
+        var expectedResult =
+                " ___________________________\r\n" +
                 " | column1| column2| column3|\r\n" +
                 " |==========================|\r\n" +
                 " | data1  | data2  | data3  |\r\n" +
-                " | data4  | data5  | data6  |\n";
+                " | data4  | data5  | data6  |\r\n";
 
         var outputStream = new ByteArrayOutputStream();
         var reportData = new ReportData(columnNames, tableData, false);
         OutputReporter.printReport(reportData, outputStream);
 
-        assertEquals(expectedResult, outputStream.toString());
+        assertTrue(outputStream.toString().contains(expectedResult));
     }
 
     @DisplayName("Should Create Report For Update")
