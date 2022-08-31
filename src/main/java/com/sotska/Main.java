@@ -12,18 +12,13 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        start();
-    }
-
-    private static void start() {
-
         var configLoader = new ConfigLoader("application.properties");
-        var port = Integer.parseInt(configLoader.getProperty("port"));
-        startWebServer(port, configLoader.getProperty("reportsPath"));
+        var port = Integer.parseInt(configLoader.getProperty("web.server.port"));
+        startWebServer(port, configLoader.getProperty("html.reportsPath"));
 
         try (var scanner = new Scanner(System.in);
-             var connectionFactory = new ConnectionFactory(configLoader.getProperty("url"),
-                     configLoader.getProperty("user"), configLoader.getProperty("password"))) {
+             var connectionFactory = new ConnectionFactory(configLoader.getProperty("jdbc.url"),
+                     configLoader.getProperty("jdbc.user"), configLoader.getProperty("jdbc.password"))) {
 
             var queryExecutor = new QueryExecutor(connectionFactory.getConnection());
 
@@ -31,7 +26,7 @@ public class Main {
                 var query = scanner.nextLine();
                 var reportData = queryExecutor.execute(query);
 
-                HtmlFileReporter.createReport(reportData, configLoader.getProperty("reportsPath"), port);
+                HtmlFileReporter.createReport(reportData, configLoader.getProperty("html.reportsPath"), port);
                 OutputReporter.printReport(reportData, System.out);
             }
         } catch (Exception e) {

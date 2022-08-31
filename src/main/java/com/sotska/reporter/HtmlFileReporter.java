@@ -1,12 +1,16 @@
 package com.sotska.reporter;
 
 import com.sotska.entity.ReportData;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class HtmlFileReporter {
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("_yyyy-MM-dd_HH-mm-ss");
 
     public static void createReport(ReportData reportData, String reportPath, int port) {
         if (reportData.isUpdate()) {
@@ -19,22 +23,22 @@ public class HtmlFileReporter {
     static String buildReport(ReportData reportData) {
         int columnCount = reportData.getColumnNames().length;
         var stringBuilder = new StringBuilder();
-        stringBuilder.append("<table>\n").append("\t<tr>\n");
+        stringBuilder.append("<table>").append("\t<tr>");
 
-        for (int i = 0; i < columnCount; i++) {
-            stringBuilder.append("\t\t<th>").append(reportData.getColumnNames()[i]).append("</th>\n");
+        for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+            stringBuilder.append("<th>").append(reportData.getColumnNames()[columnIndex]).append("</th>");
         }
-        stringBuilder.append("\t</tr>\n");
+        stringBuilder.append("</tr>");
 
-        for (int i = 0; i < reportData.getData().length; i++) {
-            stringBuilder.append("\t<tr>\n");
-            for (int j = 0; j < columnCount; j++) {
-                stringBuilder.append("\t\t<td>").append(reportData.getData()[i][j]).append("</td>\n");
+        for (int rowIndex = 0; rowIndex < reportData.getData().length; rowIndex++) {
+            stringBuilder.append("<tr>");
+            for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+                stringBuilder.append("<td>").append(reportData.getData()[rowIndex][columnIndex]).append("</td>");
             }
-            stringBuilder.append("\t</tr>\n");
+            stringBuilder.append("</tr>");
         }
-        stringBuilder.append("</table>\n");
-        return stringBuilder.toString();
+        stringBuilder.append("</table>");
+        return StringEscapeUtils.escapeHtml(stringBuilder.toString());
     }
 
     static String saveReportToFile(String report, String path) {
@@ -51,7 +55,6 @@ public class HtmlFileReporter {
     }
 
     private static String getFileReporterPrefix() {
-        var dateTimeFormatter = DateTimeFormatter.ofPattern("_yyyy-MM-dd_HH-mm-ss");
-        return dateTimeFormatter.format(LocalDateTime.now());
+        return DATE_TIME_FORMATTER.format(LocalDateTime.now());
     }
 }

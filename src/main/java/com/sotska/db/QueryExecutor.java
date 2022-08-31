@@ -26,7 +26,9 @@ public class QueryExecutor {
                     return createReportData(resultSet);
                 }
             }
-            return new ReportData(connection.createStatement().executeUpdate(query), true);
+            try (var statement = connection.createStatement()) {
+                return new ReportData(statement.executeUpdate(query), true);
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Can't execute query: " + query, e);
         }
@@ -48,8 +50,8 @@ public class QueryExecutor {
     String[] getColumnLabels(ResultSetMetaData resultSetMetaData, int columnCount) throws SQLException {
         var labels = new String[columnCount];
 
-        for (int i = 0; i < columnCount; i++) {
-            labels[i] = resultSetMetaData.getColumnLabel(i + 1);
+        for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+            labels[columnIndex] = resultSetMetaData.getColumnLabel(columnIndex + 1);
         }
         return labels;
     }
@@ -58,9 +60,9 @@ public class QueryExecutor {
         List<Object[]> data = new ArrayList<>();
         while (resultSet.next()) {
             var arr = new Object[columnCount];
-            for (int i = 0; i < columnCount; i++) {
-                var value = resultSet.getObject(i + 1);
-                arr[i] = value;
+            for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+                var value = resultSet.getObject(columnIndex + 1);
+                arr[columnIndex] = value;
             }
             data.add(arr);
         }
